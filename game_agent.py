@@ -4,6 +4,9 @@ and include the results in your report.
 """
 import random
 
+NO_MOVE = (-1, -1)
+
+INFINITY = float('inf')
 
 class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
