@@ -217,8 +217,57 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        value, move = self._minimax(game, depth, True)
+
+        return move
+
+    def _minimax(self, game, depth, maximizing_player):
+
+        # If depth limit is reached, return the evaluation function's value for game
+        if depth <= 0:
+            return self.score(game, self), NO_MOVE
+
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        legal_moves = game.get_legal_moves()
+
+        # If terminal state is reached, return the utility value for this player
+        if not legal_moves:
+            return game.utility(self), NO_MOVE
+
+        # Initialize best move
+        move = NO_MOVE
+
+        # Initialize best value
+        if maximizing_player:
+            value = -INFINITY
+        else:
+            value = +INFINITY
+
+        # Step through each legal move to get child game
+        for next_move in legal_moves:
+            next_game = game.forecast_move(next_move)
+
+            # Compute opponent's score for each next move
+            next_value, _ = self._minimax(next_game, depth-1, not maximizing_player)
+
+            if maximizing_player:
+                # If player is maximizing,
+                # And opponent's score is higher than current,
+                # Update the best score value and move to current score and move
+                if next_value >= value:
+                    value = next_value
+                    move  = next_move
+            else:
+                # If player is minimizing,
+                # And opponent's score is lower than current,
+                # Update the best score value and move to current score and move
+                if next_value <= value:
+                    value = next_value
+                    move  = next_move
+
+        return value, move
 
 
 class AlphaBetaPlayer(IsolationPlayer):
