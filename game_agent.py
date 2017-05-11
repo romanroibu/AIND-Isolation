@@ -37,8 +37,29 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    # 1st best learned weights
+    a, b = -3.9951000000000008, -4.4829
+
+    opponent  = game.get_opponent(player)
+
+    own_moves = game.get_legal_moves(player)
+    opp_moves = game.get_legal_moves(opponent)
+
+    own_count = float(len(own_moves))
+    opp_count = float(len(opp_moves))
+    count_ratio = own_count / (opp_count + 1)
+
+    w, h = game.width, game.height
+    y, x = game.get_player_location(player)
+    center_distance = float((h - y)**2 + (w - x)**2)
+
+    return (a * count_ratio) + (b * center_distance)
 
 
 def custom_score_2(game, player):
@@ -65,8 +86,29 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    # 2nd best learned weights
+    a, b = -3.3390000000000004, -3.681
+
+    opponent  = game.get_opponent(player)
+
+    own_moves = game.get_legal_moves(player)
+    opp_moves = game.get_legal_moves(opponent)
+
+    own_count = float(len(own_moves))
+    opp_count = float(len(opp_moves))
+    count_ratio = own_count / (opp_count + 1)
+
+    w, h = game.width, game.height
+    y, x = game.get_player_location(player)
+    center_distance = float((h - y)**2 + (w - x)**2)
+
+    return (a * count_ratio) + (b * center_distance)
 
 
 def custom_score_3(game, player):
@@ -91,8 +133,29 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    # 3rd best learned weights
+    a, b = -2.6100000000000003, -2.79
+
+    opponent  = game.get_opponent(player)
+
+    own_moves = game.get_legal_moves(player)
+    opp_moves = game.get_legal_moves(opponent)
+
+    own_count = float(len(own_moves))
+    opp_count = float(len(opp_moves))
+    count_ratio = own_count / (opp_count + 1)
+
+    w, h = game.width, game.height
+    y, x = game.get_player_location(player)
+    center_distance = float((h - y)**2 + (w - x)**2)
+
+    return (a * count_ratio) + (b * center_distance)
 
 
 class IsolationPlayer:
@@ -117,7 +180,7 @@ class IsolationPlayer:
         positive value large enough to allow the function to return before the
         timer expires.
     """
-    def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
+    def __init__(self, search_depth=3, score_fn=custom_score, timeout=15):
         self.search_depth = search_depth
         self.score = score_fn
         self.time_left = None
@@ -162,12 +225,12 @@ class MinimaxPlayer(IsolationPlayer):
 
         # Initialize the best move so that this function returns something
         # in case the search fails due to timeout
-        best_move = (-1, -1)
+        best_move = NO_MOVE
 
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
-            return self.minimax(game, self.search_depth)
+            best_move = self.minimax(game, self.search_depth)
 
         except SearchTimeout:
             pass  # Handle any actions required after timeout as needed
@@ -413,7 +476,7 @@ class AlphaBetaPlayer(IsolationPlayer):
                 # If player is maximizing,
                 # And opponent's score is higher than current,
                 # Update the best score value and move to current score and move
-                if next_value > value:
+                if next_value >= value:
                     value = next_value
                     move  = next_move
 
@@ -430,7 +493,7 @@ class AlphaBetaPlayer(IsolationPlayer):
                 # If player is minimizing,
                 # And opponent's score is lower than current,
                 # Update the best score value and move to current score and move
-                if next_value < value:
+                if next_value <= value:
                     value = next_value
                     move  = next_move
 
